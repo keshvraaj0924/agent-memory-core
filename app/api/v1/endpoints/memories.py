@@ -68,6 +68,7 @@ async def search_memories(
             memory=MemoryResponse.model_validate(result.memory),
             score=round(result.score, 6),
             lexical_score=round(result.lexical_score, 6),
+            semantic_score=round(result.semantic_score, 6),
             recency_score=round(result.recency_score, 6),
             importance_score=round(result.importance_score, 6),
             type_match_score=round(result.type_match_score, 6),
