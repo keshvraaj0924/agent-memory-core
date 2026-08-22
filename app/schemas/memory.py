@@ -44,6 +44,7 @@ class MemorySearchResult(BaseModel):
     memory: MemoryResponse
     score: float
     lexical_score: float
+    semantic_score: float
     recency_score: float
     importance_score: float
     type_match_score: float
