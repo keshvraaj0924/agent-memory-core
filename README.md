@@ -11,9 +11,9 @@
 
 ## Current release
 
-**v0.2.0 — Memory Lifecycle + Retrieval Baseline**
+**v0.3.0 — Hybrid Semantic Retrieval Foundation**
 
-The current release provides a complete memory CRUD lifecycle, dependency-injected storage selection, deterministic multi-factor retrieval, PostgreSQL persistence boundaries, Redis infrastructure, database migrations, request correlation, and automated quality checks.
+The current release adds an embedding provider boundary, deterministic local vector embeddings, optional Sentence Transformers support, and explainable hybrid retrieval that combines lexical, semantic, recency, importance, and memory-type signals.
 
 ## Architecture
 
@@ -31,6 +31,10 @@ The current release provides a complete memory CRUD lifecycle, dependency-inject
       ┌───────▼────────┐   ┌────────▼─────────┐  ┌────────▼────────┐
       │ Memory Policy  │   │ Retrieval Engine  │  │ Consolidation   │
       └───────┬────────┘   └────────┬─────────┘  └────────┬────────┘
+              │                     │                     │
+              │             ┌───────▼────────┐            │
+              │             │ Embedding Port │            │
+              │             └───────┬────────┘            │
               │                     │                     │
               └─────────────────────┼─────────────────────┘
                                     │
@@ -53,18 +57,29 @@ The current release provides a complete memory CRUD lifecycle, dependency-inject
 
 Each memory also tracks importance, creation/update time, last access time, and access count so retrieval policy can be measured over time.
 
-## Retrieval baseline
+## Retrieval model
 
-The current retriever deliberately uses deterministic signals rather than pretending lexical overlap is semantic understanding:
+The current hybrid retriever exposes every scoring component so ranking decisions are inspectable:
 
 ```text
-R(m, q) = α·lexical_overlap
-        + β·recency
-        + γ·importance
-        + δ·type_match
+R(m, q) = α·lexical
+        + β·semantic
+        + γ·recency
+        + δ·importance
+        + ε·type_priority
 ```
 
-This is a research baseline. The next stage will introduce an embedding provider and compare semantic retrieval against the multi-factor ranking strategy under controlled benchmarks.
+Default weights:
+
+```text
+lexical      0.35
+semantic     0.35
+recency      0.10
+importance   0.15
+type         0.05
+```
+
+The default local embedding implementation is deterministic and intentionally lightweight for tests and development. A model-backed Sentence Transformers provider is available through the optional `semantic` dependency set.
 
 ## API
 
@@ -74,9 +89,11 @@ This is a research baseline. The next stage will introduce an embedding provider
 | GET | `/api/v1/memories/{id}` | Read memory |
 | PATCH | `/api/v1/memories/{id}` | Update memory |
 | DELETE | `/api/v1/memories/{id}` | Delete memory |
-| POST | `/api/v1/memories/search` | Ranked retrieval |
+| POST | `/api/v1/memories/search` | Ranked hybrid retrieval |
 | GET | `/api/v1/health` | Liveness |
 | GET | `/api/v1/ready` | Dependency-aware readiness |
+
+Search responses include the overall score plus lexical, semantic, recency, importance, and type-match components for observability and evaluation.
 
 ## Production capabilities
 
@@ -86,13 +103,16 @@ This is a research baseline. The next stage will introduce an embedding provider
 - SQLAlchemy 2 + async PostgreSQL adapter
 - Redis infrastructure adapter
 - Configurable in-memory/PostgreSQL backend
+- Configurable retrieval/embedding backend
 - Alembic migration tooling
-- Deterministic retrieval baseline with explainable component scores
+- Hybrid retrieval with explainable score decomposition
+- Deterministic local embedding baseline
+- Optional Sentence Transformers semantic embeddings
 - Structured JSON logging
 - Request correlation via `X-Request-ID`
 - Dependency-aware readiness reporting
 - Static typing and linting
-- Unit tests and retrieval tests
+- Unit tests and retrieval/embedding tests
 - Docker-based local environment
 - GitHub Actions CI
 - Architecture Decision Records and research notes
@@ -104,7 +124,27 @@ cp .env.example .env
 docker compose up --build
 ```
 
-For local development, keep `MEMORY_BACKEND=in_memory`. For PostgreSQL-backed operation, set `MEMORY_BACKEND=postgres` and run migrations:
+For the lightweight local baseline, keep:
+
+```env
+MEMORY_BACKEND=in_memory
+RETRIEVAL_BACKEND=hybrid
+```
+
+For model-backed semantic retrieval:
+
+```bash
+pip install .[semantic]
+```
+
+and set:
+
+```env
+RETRIEVAL_BACKEND=semantic
+SEMANTIC_EMBEDDING_MODEL=BAAI/bge-small-en-v1.5
+```
+
+For PostgreSQL-backed operation, set `MEMORY_BACKEND=postgres` and run migrations:
 
 ```bash
 alembic upgrade head
@@ -133,9 +173,9 @@ app/
   api/             HTTP transport and dependency injection
   core/            settings, logging, middleware, exceptions
   domain/          domain entities and enums
-  repositories/    persistence ports
+  repositories/    persistence and embedding ports
   services/        application use cases and retrieval
-  infrastructure/  database and cache adapters
+  infrastructure/  database, cache, and embedding adapters
   schemas/         API contracts
 
 tests/
@@ -158,9 +198,12 @@ migrations/         Alembic schema history
 - [x] PostgreSQL persistence adapter
 - [x] Alembic migration baseline
 - [x] Redis infrastructure adapter
-- [x] Deterministic multi-factor retrieval baseline
 - [x] Request correlation and readiness checks
-- [ ] Embedding provider abstraction + vector retrieval
+- [x] Embedding provider abstraction
+- [x] Explainable hybrid retrieval baseline
+- [x] Deterministic local embedding provider
+- [x] Optional Sentence Transformers provider
+- [ ] Persistent vector storage / pgvector adapter
 - [ ] Memory consolidation and deduplication
 - [ ] Conflict-aware memory updates
 - [ ] Context-budget optimizer
