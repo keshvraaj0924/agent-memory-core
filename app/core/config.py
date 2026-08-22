@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     )
 
     app_name: str = "agent-memory-core"
-    app_version: str = "0.2.0"
+    app_version: str = "0.3.0"
     environment: str = "local"
     debug: bool = False
     log_level: str = "INFO"
@@ -24,6 +24,8 @@ class Settings(BaseSettings):
     api_prefix: str = "/api/v1"
 
     memory_backend: str = "in_memory"
+    retrieval_backend: str = "hybrid"
+    semantic_embedding_model: str = "BAAI/bge-small-en-v1.5"
     database_url: str = "postgresql+asyncpg://memory:memory@localhost:5432/agent_memory"
     redis_url: str = "redis://localhost:6379/0"
     database_pool_size: int = Field(default=10, ge=1, le=100)
