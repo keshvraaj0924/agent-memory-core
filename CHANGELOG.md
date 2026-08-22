@@ -2,6 +2,24 @@
 
 All notable changes to this project are documented here.
 
+## [0.3.0] - 2026-08-22
+
+### Added
+
+- Embedding provider protocol for model-independent semantic retrieval.
+- Deterministic local hash embedding provider for development and regression tests.
+- Optional Sentence Transformers provider for model-backed semantic retrieval.
+- Hybrid retrieval scoring with lexical, semantic, recency, importance, and memory-type signals.
+- Semantic score exposed in search API responses.
+- Embedding and hybrid retrieval unit tests.
+- Retrieval benchmark methodology documenting Recall@K, MRR, NDCG, and latency evaluation.
+- Configurable retrieval backend and semantic model name.
+
+### Changed
+
+- Retrieval weights now default to a balanced hybrid ranking profile.
+- README and project version updated to describe the semantic retrieval foundation.
+
 ## [0.2.0] - 2026-08-22
 
 ### Added
