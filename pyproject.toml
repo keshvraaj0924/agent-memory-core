@@ -4,17 +4,16 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agent-memory-core"
-version = "0.1.0"
+version = "0.2.0"
 description = "Production-grade memory infrastructure for intelligent agents."
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "Apache-2.0" }
 authors = [{ name = "Keshvraaj B B" }]
-keywords = ["ai", "agents", "memory", "rag", "fastapi", "llm"]
+keywords = ["ai", "agents", "memory", "rag", "fastapi", "llm", "retrieval"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Framework :: FastAPI",
-  "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.12",
   "License :: OSI Approved :: Apache Software License",
   "Typing :: Typed",
@@ -27,6 +26,7 @@ dependencies = [
   "sqlalchemy[asyncio]>=2.0.36,<3",
   "asyncpg>=0.30,<1",
   "redis>=5.2,<6",
+  "alembic>=1.15,<2",
   "structlog>=25.1,<26",
 ]
 
