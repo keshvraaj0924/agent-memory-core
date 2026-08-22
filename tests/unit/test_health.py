@@ -1,6 +1,12 @@
 from fastapi.testclient import TestClient
 
+from app.api.v1.endpoints import health as health_endpoint
 from main import app
+
+
+class HealthyRedis:
+    async def ping(self) -> bool:
+        return True
 
 
 def test_health_endpoint() -> None:
@@ -11,9 +17,12 @@ def test_health_endpoint() -> None:
     assert response.json()["status"] == "ok"
 
 
-def test_readiness_endpoint() -> None:
+def test_readiness_endpoint(monkeypatch) -> None:
+    monkeypatch.setattr(health_endpoint, "_redis", HealthyRedis())
+
     with TestClient(app) as client:
         response = client.get("/api/v1/ready")
 
     assert response.status_code == 200
     assert response.json()["status"] == "ready"
+    assert response.json()["dependencies"]["redis"] == "ok"
