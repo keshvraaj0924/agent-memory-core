@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agent-memory-core"
-version = "0.2.0"
+version = "0.3.0"
 description = "Production-grade memory infrastructure for intelligent agents."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -38,6 +38,10 @@ dev = [
   "pytest-asyncio>=0.25,<1",
   "pytest-cov>=6,<7",
   "ruff>=0.9,<1",
+]
+semantic = [
+  "numpy>=2.2,<3",
+  "sentence-transformers>=3.4,<6",
 ]
 
 [tool.hatch.build.targets.wheel]
