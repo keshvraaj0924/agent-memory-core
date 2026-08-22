@@ -15,19 +15,28 @@ class Settings(BaseSettings):
     )
 
     app_name: str = "agent-memory-core"
-    app_version: str = "0.1.0"
+    app_version: str = "0.2.0"
     environment: str = "local"
     debug: bool = False
     log_level: str = "INFO"
     host: str = "0.0.0.0"
     port: int = Field(default=8000, ge=1, le=65535)
+    api_prefix: str = "/api/v1"
+
+    memory_backend: str = "in_memory"
     database_url: str = "postgresql+asyncpg://memory:memory@localhost:5432/agent_memory"
     redis_url: str = "redis://localhost:6379/0"
-    api_prefix: str = "/api/v1"
+    database_pool_size: int = Field(default=10, ge=1, le=100)
+    database_max_overflow: int = Field(default=20, ge=0, le=100)
+    cors_origins: str = "http://localhost,http://localhost:3000"
 
     @property
     def is_production(self) -> bool:
         return self.environment.lower() == "production"
+
+    @property
+    def allowed_origins(self) -> list[str]:
+        return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
 
 
 @lru_cache(maxsize=1)
