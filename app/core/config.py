@@ -21,8 +21,8 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     host: str = "0.0.0.0"
     port: int = Field(default=8000, ge=1, le=65535)
-    database_url: str
-    redis_url: str
+    database_url: str = "postgresql+asyncpg://memory:memory@localhost:5432/agent_memory"
+    redis_url: str = "redis://localhost:6379/0"
     api_prefix: str = "/api/v1"
 
     @property
